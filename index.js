@@ -45,7 +45,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     // Send a ping to confirm a successful connection
     const classCollection = client.db('globalLanguage').collection('class')
     const instructorsCollection = client.db('globalLanguage').collection('instructors')
@@ -74,10 +74,10 @@ async function run() {
 
     app.get('/classadd/:id', async(req, res)=>{
       const id = req.params.id 
-      console.log(id)
+  
       const query = {_id: new ObjectId(id)}
       const result = await classAddCollection.findOne(query)
-      console.log(result)
+    
       res.send(result)
     })
 
@@ -97,7 +97,7 @@ async function run() {
 
     app.post('/classadd', async(req, res)=>{
       const item = req.body 
-      console.log(item)
+      
       const result = await classAddCollection.insertOne(item)
       res.send(result)
     })
@@ -121,7 +121,7 @@ async function run() {
       const user = req.body
       const query = {email: user.email}
       const existUser = await usersCollection.findOne(query)
-      console.log(existUser,'sfdsf')
+
       if(existUser){
         return res.send({message: 'user already exists'})
       }
@@ -144,7 +144,7 @@ async function run() {
 
     app.patch('/users/admin/:id', async(req, res)=>{
       const id = req.params.id 
-      console.log(id)
+   
       const filter = {_id: new ObjectId(id)}
       const updateDoc = {
         $set: {
@@ -169,7 +169,7 @@ async function run() {
 
     app.patch('/users/instructor/:id', async(req, res)=>{
       const id = req.params.id 
-      console.log(id)
+   
       const filter = {_id: new ObjectId(id)}
       const updateDoc = {
         $set: {
@@ -177,6 +177,13 @@ async function run() {
         },
       };
       const result = await usersCollection.updateOne(filter,updateDoc)
+      res.send(result)
+    })
+
+    app.delete('/userDelete/:id', async(req,res)=>{
+      const id = req.params.id 
+      const query = {_id: new ObjectId(id)}
+      const result = await usersCollection.deleteOne(query)
       res.send(result)
     })
 
@@ -192,6 +199,14 @@ async function run() {
       res.send(result)
     })
 
+  
+    app.get('/allInstructors', async(req, res)=>{
+      const query = {role: 'instructor'}
+      const result = await usersCollection.find(query).toArray()
+      res.send(result)
+    })
+
+  
     app.get('/enrolled', async(req, res)=>{
       const query = {}
       const options = {
@@ -207,6 +222,8 @@ async function run() {
       const result = await classCollection.insertOne(body)
       res.send(result)
     })
+
+   
 
     app.get('/addClass', verifyJWT, async(req, res)=>{
       const email = req.query.email 
@@ -230,7 +247,7 @@ async function run() {
 
     app.patch('/approveStatus/:id', async(req, res)=>{
       const id = req.params.id 
-      console.log(id)
+ 
       const filter = {_id: new ObjectId(id)}
       const updateDoc = {
         $set: {
@@ -243,7 +260,7 @@ async function run() {
 
     app.patch('/denyStatus/:id', async(req, res)=>{
       const id = req.params.id 
-      console.log(id)
+
       const filter = {_id: new ObjectId(id)}
       const updateDoc = {
         $set: {
@@ -254,7 +271,7 @@ async function run() {
       res.send(result)
     })
 
-
+  
      // create payment intent
      app.post('/create-payment-intent',verifyJWT, async(req, res)=>{
       const {price} = req.body 
@@ -279,6 +296,15 @@ async function run() {
       
       res.send({insertResult, deleteResult})   
     })
+
+    // payment history
+    app.get('/paymentHistory/:email', async(req, res)=>{
+      console.log({email: req.params.email})
+      const result = await paymentsCollection.find({email: req.params.email}).toArray()
+      console.log(result)
+      res.send(result)
+    })
+
 
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
