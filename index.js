@@ -93,8 +93,7 @@ async function run() {
     })
 
     app.post('/classadd', async(req, res)=>{
-      const item = req.body 
-      
+      const item = req.body     
       const result = await classAddCollection.insertOne(item)
       res.send(result)
     })
