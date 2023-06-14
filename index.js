@@ -198,8 +198,7 @@ async function run() {
       const result = await usersCollection.find(query).toArray()
       res.send(result)
     })
-
-  
+ 
     app.get('/enrolled', async(req, res)=>{
       const query = {}
       const options = {
